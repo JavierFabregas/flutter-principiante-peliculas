@@ -24,41 +24,48 @@ class MovieHorizontal extends StatelessWidget {
 
     return Container(
       height: _screenSize.height * 0.25,
-      child: PageView(
+      child: PageView.builder(
         pageSnapping: false,
         controller: _pageController,
-        children: _listaTarjetas(context),
+        itemCount: peliculas.length,
+        itemBuilder: (context , i){
+            return _tarjeta(context, peliculas[i]);
+        },
       ),
     );
   }
 
+  Widget _tarjeta(BuildContext context, Pelicula pelicula){
+    final tarjeta = Container(
+          margin: EdgeInsets.only(right: 10),
+          child: Column(
+            children: <Widget>[
+              ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: FadeInImage(
+                  placeholder: AssetImage('assets/img/no-image.jpg'), 
+                  image: NetworkImage(pelicula.getPosterImg()),
+                  fit: BoxFit.cover,
+                  height: 160,
+                  ),
+              ),
+              SizedBox(height: 5,),
+              Text(
+                pelicula.title,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.caption,
+              ),
+            ],
+          ),
+        );
 
-  List<Widget> _listaTarjetas(context){
-
-    return peliculas.map((pelicula){
-      return Container(
-        margin: EdgeInsets.only(right: 10),
-        child: Column(
-          children: <Widget>[
-            ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: FadeInImage(
-                placeholder: AssetImage('assets/img/no-image.jpg'), 
-                image: NetworkImage(pelicula.getPosterImg()),
-                fit: BoxFit.cover,
-                height: 160,
-                ),
-            ),
-            SizedBox(height: 5,),
-            Text(
-              pelicula.title,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.caption,
-            ),
-          ],
-        ),
+      return GestureDetector(
+        onTap: (){
+          print('titlo de la peli ${pelicula.title}');
+          Navigator.pushNamed(context, 'detalle',arguments: pelicula);
+        },
+        child: tarjeta,
       );
-    }).toList();
 
   }
 }
