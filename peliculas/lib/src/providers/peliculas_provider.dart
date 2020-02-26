@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:peliculas/src/models/actores_model.dart';
 import 'package:peliculas/src/models/pelicula_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -17,7 +18,7 @@ class PeliculasProvider{
 
   Function(List<Pelicula>) get popularesSink => _popularesStreamController.sink.add;
 
-  Stream<List<Pelicula>> get PopularesStream => _popularesStreamController.stream;
+  Stream<List<Pelicula>> get popularesStream => _popularesStreamController.stream;
 
   void disposeStreams(){
     _popularesStreamController?.close();
@@ -65,6 +66,20 @@ Future<List<Pelicula>> getPopulares() async{
   return resp;
   //return await _procesarRespuesta(url);
 
+}
+
+Future<List<Actor>> getCast (String idPelicula) async{
+
+  final url = Uri.https(_url, '/3/movie/$idPelicula/credits',{
+    'api_key': _apikey,
+    'languaje': _languaje
+  });
+
+  final respuesta = await http.get(url);
+  final decodedData = json.decode(respuesta.body);
+
+  final reparto = new Reparto.fromJsonList(decodedData['cast']);
+  return reparto.reparto;
 }
 
 }

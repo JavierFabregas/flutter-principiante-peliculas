@@ -69,7 +69,7 @@ Widget _footer(BuildContext context){
           ),
         SizedBox(height: 5),
         StreamBuilder(
-          stream: peliculasProvider.PopularesStream,
+          stream: peliculasProvider.popularesStream,
           builder: (BuildContext context, AsyncSnapshot snapshot){
             
             if(snapshot.hasData){
