@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:peliculas/src/models/pelicula_model.dart';
+import 'package:peliculas/src/providers/peliculas_provider.dart';
 
 class DataSearch extends SearchDelegate{
 
@@ -6,6 +8,9 @@ class DataSearch extends SearchDelegate{
 
   final peliculasRecientes = ['pelicula reciente 1','pelicula reciente 2','pelicula reciente 3','pelicula reciente 4','pelicula reciente 5'];
 
+  String seleccion = "";
+
+  final peliculasProvider = new PeliculasProvider();
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -36,13 +41,58 @@ class DataSearch extends SearchDelegate{
   @override
   Widget buildResults(BuildContext context) {
     //Crea los resultados que vamos a mostrar
-    return Container();
+    return Center(
+      child: Container(
+        width: 100,
+        height: 100,
+        color: Colors.blueAccent,
+        child: Text(seleccion),
+      )
+    );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     // Sugerencias que aparecen cuando se escribe
-    
+
+  if (query.isEmpty) return Container();
+
+  return FutureBuilder(
+    future: peliculasProvider.buscarPelicula(query),
+    builder: (BuildContext context, AsyncSnapshot<List<Pelicula>> snapshot){
+
+      if (snapshot.hasData) {
+        final peliculas = snapshot.data;
+        return ListView(
+          children: peliculas.map((pelicula){
+            return ListTile(
+              leading: FadeInImage(
+                 placeholder: AssetImage('assets/img/no-image.jpg'),
+                 image: NetworkImage(pelicula.getPosterImg()),
+                 width: 50,
+                 fit: BoxFit.contain,
+                 ),
+                 title: Text(pelicula.title),
+                 subtitle: Text(pelicula.originalTitle),
+                 onTap: (){
+                   pelicula.uniqueID = "";
+                   close(context, null);
+                   Navigator.pushNamed(context, 'detalle', arguments: pelicula);
+                 },
+            );
+          }).toList()
+        );
+
+      }else{
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      }
+    }
+  );
+
+
+    /*
     final listaSugerida = (query.isEmpty) 
                             ? peliculasRecientes 
                             : peliculas.where(
@@ -57,10 +107,12 @@ class DataSearch extends SearchDelegate{
           title: Text(listaSugerida[i]),
           onTap: (){
             //print(listaSugerida[i]);
+            seleccion = listaSugerida[i];
+            showResults(context);
           },
         );
       }
-      );
+      );*/
   }
 
 }
